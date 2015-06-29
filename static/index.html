@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>ET/DP Tester</title>
+		<meta charset="utf-8" />
+
+		<link href='http://fonts.googleapis.com/css?family=Lato&amp;subset=latin,latin-ext' rel='stylesheet' type='text/css' />
+		<link rel="stylesheet" href="css/styles.css" />
+
+		<link rel="prefetch" href="images/bender.jpg" />
+		<link rel="prefetch" href="images/fry.jpg" />
+	</head>
+
+	<body>
+		<h1 id="heading">ET {go home?}</h1>
+		<div id="container">
+			<div id="image-box">
+				<!-- image goes here -->
+			</div>
+			<div id="chat-box">
+				<h2 id="title-box">Turing Test in Progress</h2>
+				<div id="messages">
+					<em id="welcome">Go on, say "Hello" to ET!</em>
+				</div>
+				<div id="write">
+					<form action="javascript://" method="POST" id="cform">
+						<textarea rows="2" cols="50" placeholder="Type here..." id="input" name="input"></textarea>
+						<input type="submit" value="Send" id="submit" />
+					</form>
+				</div>
+			</div>
+		</div>
+		<script src="js/ajax.mini.js"></script>
+		<script src="js/fun.mini.js"></script>
+		<script src="js/chat.js"></script>
+	</body>
+</html>
