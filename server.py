@@ -1,4 +1,4 @@
-from API.watson import WatsonService
+from sherlock.watson.watson import WatsonService
 from API import WebServer
 from API.bottle import *
 
