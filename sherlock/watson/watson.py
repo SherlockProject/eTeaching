@@ -9,7 +9,7 @@ except ImportError:
 
 from cgi import parse_header, parse_multipart
 from urllib.parse import parse_qs, urlparse
-from . import requests
+import requests
 from copy import copy
 import inspect, os
 
