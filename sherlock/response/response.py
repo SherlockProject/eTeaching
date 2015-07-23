@@ -1,6 +1,6 @@
 class Answer:
 
-	def rndmReply(sentence, num_interaction):
+	def rndmReply(self,sentence, num_interaction):
 		if num_interaction == 0:
 			return "Hello, I'm Sherlock, who are you?"
 		elif num_interaction == 1:
