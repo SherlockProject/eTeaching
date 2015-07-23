@@ -2,6 +2,8 @@ from sherlock.sherlock import Sherlock
 
 handler = Sherlock('handler')
 
+print(handler.activeSession)
+
 resp1 = handler.process('')
 print(resp1['text'])
 

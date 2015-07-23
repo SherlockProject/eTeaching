@@ -1,35 +1,37 @@
 # base program: MANAGER
 
-from vision.see import See
-from language.hear import Hear
-import response.response
+from sherlock.vision.see import See
+from sherlock.language.hear import Hear
+from sherlock.response.response import proc_userInp
 
 class Sherlock:
 
     # DUMMY
     def __init__(self, string):
-        noSessions = 0
-        activeSession = False
+        self.noSessions = 0
+        self.activeSession = False
         self.name = string
 
     def startSession(self):
-        noInteraction = 0
-        sessionID = noSession + 1
-        activeSession = True
+        self.noInteraction = 0
+        self.sessionID = self.noSessions + 1
+        self.activeSession = True
 
     def endSession(self):
-        activeSession = False
+        self.activeSession = False
 
     def process(self, input):
-        if not activeSession:
-            startSession()
-            response['text'] = proc_UserInp('',noInteraction)
+        if not self.activeSession:
+            self.startSession()
+            response = {}
+            response['text'] = proc_userInp('',self.noInteraction)
             response['imagePATH'] = 'a140032.jpg'
 
             return response
         else:
-            noInteraction += 1
-            reponse['text'] = proc_UserImp(input, noInteraction)
+            self.noInteraction += 1
+            response = {}
+            response['text'] = proc_userInp(input, self.noInteraction)
 
             return response
 
