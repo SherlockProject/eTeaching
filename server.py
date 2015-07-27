@@ -21,11 +21,11 @@ def process_func():
 	req = JSON.loads( bottle.request.POST[ 'request' ] );
 
 	if( req['type'] == 'start' ):
+		bottle.response.delete_cookie( 'beaker.session.id' );
 		response = {
 			'type': 'message',
 			'text': "Hello, my name is ET! How you doin'?"
 		};
-		bottle.response.delete_cookie( 'beaker.session.id' );
 
 	elif( req['type'] == 'message' ):
 		response = {
