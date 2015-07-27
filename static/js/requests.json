@@ -1,0 +1,48 @@
+// request
+{
+	'type':			'message|image|session_start',
+	'session_id':	's65675dsa6456fdsdfs767sdf5'
+	'sound':		'on|off',
+	'message':		'...'
+}
+
+// response
+{
+	'type':			'message|image|session_start|bound_box',
+	'session_id':	's65675dsa6456fdsdfs767sdf5'
+	'message':		'...'
+}
+
+> session_start
+< sda67df5d6fd45f
+sda67df5d6fd45f > message: hello
+
+// session start request
+request = {
+	'type': 'session_start',
+	'sound': 'on|off'
+}
+response = {
+	'session_id': '...',
+	'text': '...'
+}
+
+// chat message
+request = {
+	'type': 'message',
+	'text': '...',
+	'session_id': '....',
+	'sound': 'on|off'
+}
+response = {
+	'type': 'message',
+	'text': '...'
+}
+
+// image
+response = {
+	'type': 'image',
+	'text': '...', // optional
+	'path': '...',
+	'text': '...'
+}

@@ -1,6 +1,8 @@
 from sherlock.watson.watson import WatsonService
+from sherlock.response.response import Answer
 from API import WebServer
-from API.bottle import *
+import json as JSON
+import bottle
 
 textToSpeech = WatsonService(
 	url = 'https://stream.watsonplatform.net/text-to-speech-beta/api',
@@ -13,66 +15,34 @@ textToSpeech = WatsonService(
 	}
 );
 
-# Returning text (http://localhost:4242/speak-to-me)
-@post( '/speak-to-me' )
-def speak_to_me():
-	# English - male voice
-	voice = 'VoiceEnUsMichael';
+# Returning text (http://localhost:4242/process)
+@bottle.post( '/process' )
+def process_func():
+	req = JSON.loads( bottle.request.POST[ 'request' ] );
 
-	# Text sent from the chat
-	user_input = request.POST[ 'input' ];
+	if( req['type'] == 'start' ):
+		response = {
+			'type': 'message',
+			'text': "Hello, my name is ET! How you doin'?"
+		};
+		bottle.response.delete_cookie( 'beaker.session.id' );
 
-	# If empty - exit
-	if( user_input is None ):
-		return;
-
-	# Say <sentence> (say command)
-	if( user_input[0:4].lower() == 'say ' ):
-		message = user_input[4:];
-
-	# Scary goodbye message
-	elif( user_input.lower() in [ 'bye', 'goodbye', 'chao', 'bye, et', 'goodbye, et', 'bye et', 'goodbye et' ] ):
-		message = 'Goodbye, human. Now, prepare to be terminated!';
+	elif( req['type'] == 'message' ):
+		response = {
+			'type': 'message',
+			'text': 'answer something'
+		};
 
 	else:
-		message = 'Hello, my name is E.T.';
+		response = {
+			'type': 'error',
+			'error': 'Unknown request type'
+		};
 
-	# Transform text to audio
-	result = textToSpeech.synthesize( params={
-		'accept': 'audio/ogg;codecs=opus',
-		'voice': voice,
-		'text': message
-	} );
+	if( req['sound'] == 'on' and response['text'] ):
+		# generate sound file
+		pass;
 
-	# Save it as a file
-	ogg = open( 'static/sounds/answer.ogg', 'wb' );
-	ogg.write( result );
-
-	return message;
-
-# NOTE: I need this to connect to some kind of intial setup!
-#       My Idea was, a welcome box popup with an input promt for a name
-#       Sets up the initial image as well!
-@post( '/start-session' )
-def start_session():
-	# Set up a session with 1 user.
-	return 'Session started.'
-
-# NOTE: This one should be called with a 'Good Bye' button for now!
-#       Ideally we want to recognize good byes in text and react from there
-#       so this might be temp.
-@post( '/end-session' )
-def end_session():
-	# End session with curr user.
-	return 'Session over.'
-
-# NOTE: This is the default function I need for any user Input!
-#		As discussed, this only needs to be text exchanges for now,
-#       however, I d like to immediatly be able to recieve img IDs
-# 		and send actual images to be displayed!
-@post( '/process' )
-def process():
-	# start processing
-	return 'Update!'
+	return response;
 
 WebServer.start();

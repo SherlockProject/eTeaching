@@ -2,37 +2,90 @@
 
 <html>
 	<head>
-		<title>ET/DP Tester</title>
+		<title>E-Teaching</title>
+
 		<meta charset="utf-8" />
 
-		<link href='http://fonts.googleapis.com/css?family=Lato&amp;subset=latin,latin-ext' rel='stylesheet' type='text/css' />
-		<link rel="stylesheet" href="css/styles.css" />
+		<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Roboto|Roboto+Slab&amp;subset=latin" />
+		<link rel="stylesheet" type="text/css" href="css/styles.css" />
+		<link rel="stylesheet" type="text/css" href="css/blue.css" />
 
-		<link rel="prefetch" href="images/bender.jpg" />
-		<link rel="prefetch" href="images/fry.jpg" />
+		<!--[if lt IE 9]><script src="js/html5.js"></script><![endif]-->
+		<script src="js/tween.min.js"></script>
+		<script src="js/ajax.min.js"></script>
+		<script src="js/scripts.js"></script>
+		<script src="js/toolset.js"></script>
+		<script src="js/chat.js"></script>
 	</head>
 
-	<body>
-		<h1 id="heading">ET {go home?}</h1>
-		<div id="container">
-			<div id="image-box">
-				<!-- image goes here -->
-			</div>
-			<div id="chat-box">
-				<h2 id="title-box">Turing Test in Progress</h2>
-				<div id="messages">
-					<em id="welcome">Go on, say "Hello" to ET!</em>
+	<body id="light" class="wait">
+		<article id="container">
+			<header id="header">
+				<h1 id="title">E-Teaching</h1>
+				<h2 id="subtitle">Turing test in progress</h2>
+				<a href="javascript:chat.mute();" id="mute" title="Sound On">Mute</a>
+			</header>
+			<div id="chat-col">
+				<div id="chat-body">
+					<!--
+					<div class="post robot">
+						<div class="avatar"><div class="face"><span class="eyes"></span></div></div>
+						<div class="message">Make a selection around the person and <a href="#">click OK.</a></div>
+					</div>
+					<div class="post robot eyes-up">
+						<div class="avatar" title="Thinking...">
+							<span id="thinking"></span>
+							<div class="face">
+								<span class="eyes"></span>
+							</div>
+						</div>
+						<div class="thumb"><img src="images/thumb1.jpg" alt="" /></div>
+					</div>
+					<div class="post human">
+						<div class="message">Now that we know who you are I know who I am</div>
+					</div>
+					-->
 				</div>
-				<div id="write">
-					<form action="javascript://" method="POST" id="cform">
-						<textarea rows="2" cols="50" placeholder="Type here..." id="input" name="input"></textarea>
-						<input type="submit" value="Send" id="submit" />
-					</form>
+				<div id="form-parent">
+					<div id="form">
+						<form id="cform" method="post" action="javascript://">
+							<label for="input" id="type-label"><textarea id="input" placeholder="Type here... (say hello)"></textarea></label>
+							<input type="submit" value="Send" id="send" />
+						</form>
+					</div>
 				</div>
 			</div>
-		</div>
-		<script src="js/ajax.mini.js"></script>
-		<script src="js/fun.mini.js"></script>
-		<script src="js/chat.js"></script>
+			<div id="image-col">
+				<div id="tools-parent">
+					<ul id="tools">
+						<li><a title="Upload Image" id="upload"><img src="images/upload-icon.jpg" alt="" />Add Image</a></li>
+						<li><a title="Select Tool" id="select"><img src="images/select-icon.jpg" alt="" />Select</a></li>
+						<li><a title="Lasso Tool" id="lasso"><img src="images/lasso-icon.jpg" alt="" />Lasso</a></li>
+						<li><a title="Hand Tool" id="hand"><img src="images/drag-icon.jpg" alt="" />Hand</a></li>
+						<li><a title="Pointer Tool" id="cursor"><img src="images/cursor-icon.jpg" alt="" />Pointer</a></li>
+						<li id="zoom-li">
+							<div id="zoom">
+								<a id="zoom-out"></a>
+								<a id="zoom-in"></a>
+								<div id="scale-parent">
+									<a id="zoom-drag"><img src="images/zoom-drag.jpg" alt="" /></a>
+									<img src="images/zoom-scale.jpg" id="scale" alt="" />
+								</div>
+							</div>
+							<span id="zoom-percent">100</span>%
+						</li>
+					</ul>
+				</div>
+			</div>
+		</article>
+		<div id="l1" class="load-line"></div>
+		<div id="l2" class="load-line"></div>
+		<div id="l3" class="load-line"></div>
+		<div id="l4" class="load-line"></div>
+		<div id="l5" class="load-line"></div>
+		<script>
+			chat();		// Run Chat
+			toolset();	// Run Toolset
+		</script>
 	</body>
 </html>

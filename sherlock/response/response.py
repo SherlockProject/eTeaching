@@ -1,3 +1,4 @@
+
 class Answer:
 
 	def rndmReply(self,sentence, num_interaction):
