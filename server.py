@@ -21,7 +21,8 @@ def process_func():
 	req = JSON.loads( bottle.request.POST[ 'request' ] );
 
 	if( req['type'] == 'start' ):
-		bottle.response.delete_cookie( 'beaker.session.id' );
+		WebServer.start_conversation();
+
 		response = {
 			'type': 'message',
 			'text': "Hello, my name is ET! How you doin'?"

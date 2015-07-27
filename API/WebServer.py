@@ -8,7 +8,7 @@ def printTitle( str ):
 printTitle( 'Installing packages from requirements.txt ...' );
 
 subprocess.call( "pip install -r requirements.txt", stdout=subprocess.PIPE );
-print( 'Packages installed\n' );
+print( 'Done.\n' );
 
 printTitle( 'Web Server starting...' );
 
@@ -50,6 +50,9 @@ def user( value = None ):
 		u = session.get( 'user' );
 		
 		return u;
+
+def start_conversation():
+	response.delete_cookie( 'beaker.session.id' );
 
 def start( host = 'localhost', port = 4242 ):
 	host = os.getenv( 'VCAP_APP_HOST', host );
