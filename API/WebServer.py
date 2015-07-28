@@ -48,7 +48,7 @@ def user( value = None ):
 			session.set( 'user', value );
 	else:
 		u = session.get( 'user' );
-		
+
 		return u;
 
 def start_conversation():
