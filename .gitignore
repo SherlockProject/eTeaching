@@ -1,6 +1,8 @@
 *.pyc
 *.pyo
 __pycache__
-data/images/*
+data/images
+data/benchmarkResults
+data/imageDescriptions
 api_key.txt
 api_key.txt~
