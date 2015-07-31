@@ -1,5 +1,4 @@
 import subprocess;
-import beaker;
 import os;
 
 def printTitle( str ):
@@ -7,13 +6,27 @@ def printTitle( str ):
 
 printTitle( 'Installing packages from requirements.txt ...' );
 
-subprocess.call( "pip install -r requirements.txt", stdout=subprocess.PIPE );
+subprocess.call( "pip install -r requirements.txt" );#, stdout=subprocess.PIPE
 print( 'Done.\n' );
 
 printTitle( 'Web Server starting...' );
 
-from beaker.middleware import SessionMiddleware
+from beaker.middleware import SessionMiddleware;
 from bottle import *;
+
+import pymysql, pymysql.cursors, beaker;
+
+connection = pymysql.connect( cursorclass	= pymysql.cursors.DictCursor,
+							  host			= 'us-cdbr-iron-east-02.cleardb.net',
+							  db			= 'ad_96cd6dc8fac0ede',
+							  user			= 'b3517254728bb2',
+							  passwd		= '3e269665' );
+
+#with connection.cursor() as cursor:
+#	# Read a single record
+#	cursor.execute( "select * from information_schema.tables" );
+#	result = cursor.fetchone();
+#	print( result );
 
 session_opts = {
 	'session.type': 'file',
@@ -48,7 +61,7 @@ def user( value = None ):
 			session.set( 'user', value );
 	else:
 		u = session.get( 'user' );
-
+		
 		return u;
 
 def start_conversation():
