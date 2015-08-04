@@ -6,3 +6,4 @@ data/benchmarkResults
 data/imageDescriptions
 api_key.txt
 api_key.txt~
+*.cache

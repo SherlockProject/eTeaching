@@ -1,5 +1,4 @@
 from sherlock.watson.watson import WatsonService
-from sherlock.response.response import Answer
 from API import WebServer
 import json as JSON
 import bottle
@@ -14,6 +13,11 @@ textToSpeech = WatsonService(
 		}
 	}
 );
+
+@bottle.route( '/test' )
+def test():
+	print( bottle.request.get_cookie("beaker.session.id") );
+	return '';
 
 # Returning text (http://localhost:4242/process)
 @bottle.post( '/process' )
@@ -44,6 +48,6 @@ def process_func():
 		# generate sound file
 		pass;
 
-	return response;
+	return WebServer.processResponse( response );
 
 WebServer.start();
