@@ -1,11 +1,12 @@
 from sherlock.watson.watson import WatsonService
+from API.WebServer import user
 from API import WebServer
 import json as JSON
 import bottle
 
 textToSpeech = WatsonService(
-	url = 'https://stream.watsonplatform.net/text-to-speech-beta/api',
-	auth = ( 'ce3219f1-fae8-40d0-ae1b-e1f17fa4074c', '6MN0tdcfU4f6' ),
+	url = 'https://stream.watsonplatform.net/text-to-speech/api',
+	auth = ( '24bdc1c7-3e7e-46e5-9e6b-17d45d15b14e', '3W29o3r6OV5X' ),
 	operations = {
 		'synthesize': {
 			'method': 'GET',
@@ -14,29 +15,61 @@ textToSpeech = WatsonService(
 	}
 );
 
-@bottle.route( '/test' )
-def test():
-	print( bottle.request.get_cookie("beaker.session.id") );
-	return '';
+hello = 'Hello, my name is Sherlock! If you want to see a photo - type "image". If you\'d like to hear some latin - just type anything.';
 
 # Returning text (http://localhost:4242/process)
 @bottle.post( '/process' )
 def process_func():
-	req = JSON.loads( bottle.request.POST[ 'request' ] );
+	request = JSON.loads( bottle.request.POST[ 'request' ] );
 
-	if( req['type'] == 'start' ):
+	if( request['type'] == 'start' ):
 		WebServer.start_conversation();
 
 		response = {
 			'type': 'message',
-			'text': "Hello, my name is ET! How you doin'?"
+			'text': hello
 		};
 
-	elif( req['type'] == 'message' ):
-		response = {
-			'type': 'message',
-			'text': 'answer something'
-		};
+	elif( request['type'] == 'message' ):
+		# import pprint;
+		# pprint.pprint( user.info ); # user and conversation identifiers
+		# pprint.pprint( user.data ); # empty dict that can be used throughout the whole conversation as storage
+		                              # e.g. you can store all images that you have used in a conversation
+
+		if( 'iteration' not in user.data ):
+			user.data['iteration'] = 0;
+
+		user.data['iteration'] = user.data['iteration'] + 1;
+		print( '\nIteration: ' + str( user.data['iteration'] ) );
+
+		#-------------------------- Generate Random Text ---------------------------------------------------------#
+		import requests,shutil;
+		randomText = requests.get( 'http://loripsum.net/api/plaintext/1/short/headers' ).text.split( '\n' )[0];
+		#---------------------------------------------------------------------------------------------------------#
+
+		if( request['text'] == 'image' ):
+
+			#---------------------------- download random image ----------------------------#
+			r = requests.get( 'http://lorempixel.com/600/400/', stream=True );
+			image_path = 'static/work_images/' + str( user.info['userID'] ) + '.jpg';
+
+			if r.status_code == 200:
+				with open( image_path, 'wb' ) as f:
+					r.raw.decode_content = True;
+					shutil.copyfileobj( r.raw, f );
+			#-------------------------------------------------------------------------------#
+
+			response = {
+				'type': 'image',
+				'text': 'Take a look at this image. Can you help me find Waldo?',
+				'path': image_path,
+				'imid': 'image-identifier' # unique identifier (image name/id in a database)
+			};
+		else:
+			response = {
+				'type': 'message',
+				'text': randomText
+			};
 
 	else:
 		response = {
@@ -44,9 +77,17 @@ def process_func():
 			'error': 'Unknown request type'
 		};
 
-	if( req['sound'] == 'on' and response['text'] ):
-		# generate sound file
-		pass;
+	# generate sound file
+	if( request['sound'] == 'on' and response['text'] and response['text'] != hello ):
+		result = textToSpeech.synthesize( params = {
+			'accept': 'audio/ogg; codecs=opus',
+			'voice': 'en-US_MichaelVoice',
+			'text': response['text']
+		} );
+
+		# Save File
+		ogg = open( 'static/sound/answer.ogg', 'wb' );
+		ogg.write( result );
 
 	return WebServer.processResponse( response );
 

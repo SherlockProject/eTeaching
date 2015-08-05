@@ -1,16 +1,35 @@
 
 	var chat = function () {
 		var
+			iParent	= document.get( 'image-parent' ),
 			fparent	= document.get( 'form-parent' ),
 			cbody	= document.get( 'chat-body' ),
 			form	= document.get( 'cform' ),
 			input	= document.get( 'input' ),
 			submit	= document.get( 'send' ),
 			muteBtn	= document.get( 'mute' ),
+			image	= document.get( 'image' ),
+			thg		= document.get( 'thinking' ),
 
-			session	= null,
+			audio	= null,
 			nosend	= true,
 			sound	= true,
+
+			playAudio = function ( path, config ) {
+				if( audio )
+					audio.pause();
+
+				audio = new Audio( path );
+
+				if( typeof config !== 'undefined' ) {
+					if( config.onstart )
+						audio.oncanplay = config.onstart;
+					if( config.onend )
+						audio.onended = config.onend;
+				}
+
+				audio.play();
+			},
 
 			trim = function( str ) {
 				return str.replace( /^\s+|\s+$/gm, '' );
@@ -33,31 +52,93 @@
 				var
 					container	= document.createElement( 'div' ),
 					text		= document.createElement( 'div' ),
+					bigcont		= document.createElement( 'div' ),
+					tmbParent,
+					bigcont,
 					avatar,
+					mouth,
 					face,
-					eyes;
+					eyes,
+					tmb;
 
 				container.className	= 'post human';
+				bigcont.className	= 'bigcont';
 				text.className		= 'message';
-				text.innerHTML		= escapeHtml( message );
 
 				if( who == 'robot' ) {
 					avatar	= document.createElement( 'div' );
 					face	= document.createElement( 'div' );
 					eyes	= document.createElement( 'span' );
-					container.className = 'post robot';
+					mouth	= document.createElement( 'img' );
+					container.className = 'post robot eyes-up';
 					avatar.className = 'avatar';
+					mouth.className = 'mouth';
 					face.className = 'face';
 					eyes.className = 'eyes';
 
+					if( !thg ) {
+						thg	= document.createElement( 'span' );
+						thg.setAttribute( 'id', 'thinking' );
+					}
+
+					avatar.setAttribute( 'title', 'Thinking...' );
+
+					avatar.appendChild( thg );
 					avatar.appendChild( face );
 					face.appendChild( eyes );
 					container.appendChild( avatar );
 				}
-				container.appendChild( text );
+				else {
+					text.innerHTML = escapeHtml( message );
+					bigcont.appendChild( text );
+					container.appendChild( bigcont );
+				}
+
 				cbody.appendChild( container );
 
 				scrollToBottom();
+
+				if( who == 'robot' ) {
+					return function( message, thumb ) {
+						text.innerHTML = escapeHtml( message );
+						bigcont.appendChild( text );
+						container.appendChild( bigcont );
+
+						avatar.setAttribute( 'title', '' );
+						container.className = 'post robot';
+						thg.parentNode.removeChild( thg );
+
+						mouth.setAttribute( 'src', 'images/mouth.gif' );
+
+						avatar.appendChild( mouth );
+
+						if( typeof thumb != 'undefined' ) {
+							tmbParent	= document.createElement( 'div' );
+							tmb			= document.createElement( 'img' );
+							tmbParent.className = 'thumb';
+
+							tmb.onload = scrollToBottom;
+							tmb.src = thumb + '?rand=' + Math.random();
+
+							tmbParent.appendChild( tmb );
+							bigcont.appendChild( tmbParent );
+						}
+
+						scrollToBottom();
+
+						if( sound ) {
+							var path = 'sound/answer.ogg';
+
+							if( message == 'Hello, my name is Sherlock! If you want to see a photo - type "image". If you\'d like to hear some latin - just type anything.' )
+								path = 'sound/hello.ogg';
+
+							playAudio( path, {
+								'onstart': function () { if( sound ) mouth.src = 'images/mouth-talk.gif?a=5'; },
+								'onend': function () { mouth.src = 'images/mouth.gif'; }
+							} );
+						}
+					};
+				}
 			},
 
 			resizeField = function () {
@@ -99,59 +180,107 @@
 			input.onkeyup	= resizeField;
 			input.focus();
 
-		// Session Start
-		Ajax.POST( '/process', {
-			'data': { 'request': JSON.stringify( {
-				'type':		'start',
-				'sound':	sound
-			} ) },
-			'onload': function ( response ) {
-				response	= JSON.parse( response.text );
-				nosend		= false;
-
-				if( response.type == 'message' ) {
-					if( typeof response.text != 'undefined' )
-						publish( 'robot', response.text );
-				}
-			}
-		} );
-
-		chat = {
-			'send': function () {
-				if( trim( input.value ) == '' || nosend )
-					return input.focus();
-
-				nosend = true;
-
-				Ajax.POST( '/process#test', {
+		return {
+			'init': function () {
+				// Session Start
+				Ajax.POST( '/process', {
 					'data': { 'request': JSON.stringify( {
-						'type':			'message',
-						'text':			trim( input.value ),
-						'session_id':	session,
-						'sound':		sound
+						'type':		'start',
+						'sound':	sound ? 'on' : 'off'
 					} ) },
 					'onload': function ( response ) {
 						response	= JSON.parse( response.text );
 						nosend		= false;
 
-						if( response.type == 'message' && typeof response.text != 'undefined' ) {
-							publish( 'robot', response.text );
+						switch( response.type ) {
+							case 'message':
+								if( typeof response.text != 'undefined' )
+									publish( 'robot' )( response.text );
+							break;
+
+							case 'error':
+								publish( 'robot' )( 'Error: ' + response.error );
+							break;
 						}
 					}
 				} );
 
-				publish( 'human', input.value );
+				chat = {
+					'send': function () {
+						var onloaded, text = trim( input.value );
 
-				cbody.style.height = 'calc( 100vh - 13.58vw )';
-				input.placeholder = 'Type here...';
-				input.value = '';
-				input.focus();
-			},
+						if( trim( input.value ) == '' || nosend )
+							return input.focus();
 
-			'mute': function () {
-				sound = !sound;
-				muteBtn.style.backgroundPosition = ( sound ? 'top ' : 'bottom ' ) + 'left';
-				muteBtn.setAttribute( 'title', sound ? 'Sound On' : 'Sound Off' );
+						nosend = true;
+
+						window.setTimeout( function() {
+							onloaded = publish( 'robot' );
+
+							cbody.style.height = 'calc( 100vh - 13.58vw )';
+							input.placeholder = 'Type here...';
+							input.value = '';
+
+							Ajax.POST( '/process', {
+								'data': { 'request': JSON.stringify( {
+									'type':			'message',
+									'text':			text,
+									'sound':		sound ? 'on' : 'off'
+								} ) },
+								'onload': function ( response ) {
+									response	= JSON.parse( response.text );
+									nosend		= false;
+
+									switch( response.type ) {
+										case 'message':
+											if( typeof response.text != 'undefined' )
+												onloaded( response.text );
+										break;
+
+										case 'image':
+											if( typeof response.text != 'undefined' )
+												onloaded( response.text, response.thumb.replace( /^static\//, '' ) );
+
+											if( typeof response.path != 'undefined' ) {
+												if( !image ) {
+													image = document.createElement( 'img' );
+													image.setAttribute( 'id', 'image' );
+
+													iParent.appendChild( image );
+												}
+
+												image.style.display = 'none';
+
+												image.onload = function () {
+													image.style.display = 'inline';
+												};
+
+												image.src = response.path.replace( /^static\//, '' ) + '?rand=' + Math.random();
+											}
+										break;
+
+										case 'error':
+											onloaded( 'Error: ' + response.error );
+										break;
+									}
+								}
+							} );
+						}, 500 );
+
+						publish( 'human', text );
+
+						cbody.style.height = 'calc( 100vh - 13.58vw )';
+						input.placeholder = 'Type here...';
+						input.value = '';
+						input.focus();
+					},
+
+					'mute': function () {
+						sound = !sound;
+						muteBtn.style.backgroundPosition = ( sound ? 'top ' : 'bottom ' ) + 'left';
+						muteBtn.setAttribute( 'title', sound ? 'Sound On' : 'Sound Off' );
+					}
+				};
 			}
 		};
 	};

@@ -113,6 +113,22 @@
 		z-index: 1;
 		width: 0;
 	}
+	#image-parent {
+		height: calc( 100vh - 6.25vw );
+		position: relative;
+		overflow: auto;
+		width: 100%;
+	}
+	#image-parent img {
+		-webkit-box-shadow: 0px 0px 25px -2px rgba(0,0,0,0.75);
+		-moz-box-shadow: 0px 0px 25px -2px rgba(0,0,0,0.75);
+		box-shadow: 0px 0px 25px -2px rgba(0,0,0,0.75);
+		transform: translate( -50%, -50% );
+		left: 50%; top: 50%;
+		position: absolute;
+		max-height: 100%;
+		max-width: 100%;
+	}
 	#tools {
 		-webkit-box-sizing: border-box;
 		-moz-box-sizing: border-box;
@@ -183,6 +199,8 @@
 	:-moz-placeholder { font-style: italic; color: #999999; }
 
 	#tools { margin-left: 5px; }
+
+	#tools li * { cursor: default !important; }
 
 	#tools li {
 		margin-top: 1.40vw;
@@ -303,6 +321,13 @@
 	div.eyes-down-left span.eyes { margin: 0; left: 5%; bottom: 10%; top: auto; }
 	div.eyes-down-right span.eyes { margin: 0; left: auto; right: 5%; bottom: 10%; top: auto; }
 
+	img.mouth {
+		width: 0.78vw; height: 0.23vw;
+		top: 1.95vw; left: 50%;
+		margin-left: -0.39vw;
+		position: absolute;
+	}
+
 	#thinking {
 		background: url( '../images/thinking.gif' ) no-repeat 0 0;
 		width: 17px; height: 5px;
@@ -311,14 +336,19 @@
 		margin: 0 0 0 -9px;
 		display: block;
 	}
-	div.robot div.message {
-		background: #EDF5FE;
+	div.robot div.bigcont {
+		width: 60%;
 		float: left;
 	}
-	div.human div.message {
+	div.human div.bigcont {
 		margin-right: 2.34vw;
-		background: #EFEFEF;
 		float: right;
+	}
+	div.robot div.message {
+		background: #EDF5FE;
+	}
+	div.human div.message {
+		background: #EFEFEF;
 	}
 	div.message {
 		border-radius: 6px 6px 6px 6px;
@@ -326,8 +356,9 @@
 		-webkit-border-radius: 6px 6px 6px 6px;
 		padding: 1.17vw 1.56vw 1.25vw 1.56vw;
 		border: 0px solid #000000;
+		word-wrap: break-word;
 		font-size: 0.95em;
-		max-width: 60%;
+		max-width: 100%;
 		color: #1F1F1F;
 	}
 	div.message a {
@@ -335,16 +366,16 @@
 		text-decoration: none;
 		color: #1F1F1F;
 	}
-	div.robot div.thumb { float: left; }
-	div.human div.thumb { float: right; margin-right: 30px; }
+	div.robot div.thumb { margin-top: 1.56vw; }
 	div.thumb {
 		border-radius: 6px 6px 6px 6px;
 		-moz-border-radius: 6px 6px 6px 6px;
 		-webkit-border-radius: 6px 6px 6px 6px;
 		border: 0px solid #000000;
-		padding: 3.12vw 2.65vw;
+		display: inline-block;
 		background: #acacac;
-		cursor: pointer;
+		padding: 1.65vw;
+		cursor: default;
 	}
 	div.thumb img { border: 1px solid #FFD64A; max-width: 7.81vw; max-height: 7.81vw; }
 

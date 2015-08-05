@@ -1,26 +1,33 @@
+from datetime import datetime, timedelta;
 from time import gmtime, strftime;
 import subprocess, os;
+import pprint;
 
 def printTitle( str ):
 	print( ( '{0}| ' + str + '{0}' ).format( '\n|------------------------------------------------\n' ) );
 
 printTitle( 'Installing packages from requirements.txt ...' );
-subprocess.call( "pip install -r requirements.txt" );#, stdout=subprocess.PIPE
+subprocess.call( "pip install -r requirements.txt", stdout=subprocess.PIPE );
 print( 'Done.\n' );
 printTitle( 'Web Server starting...' );
 
 from beaker.middleware import SessionMiddleware;
 import pymysql, pymysql.cursors, beaker;
+from PIL import Image;
 from bottle import *;
+import beaker;
 
 # Connect to MySQL db
-connection = pymysql.connect(
-	cursorclass = pymysql.cursors.DictCursor,
-	host = 'us-cdbr-iron-east-02.cleardb.net',
-	db = 'ad_96cd6dc8fac0ede',
-	user = 'b3517254728bb2',
-	passwd = '3e269665'
-);
+def connect():
+	global connection;
+
+	connection = pymysql.connect(
+		cursorclass = pymysql.cursors.DictCursor,
+		host = 'us-cdbr-iron-east-02.cleardb.net',
+		db = 'ad_96cd6dc8fac0ede',
+		user = 'b3517254728bb2',
+		passwd = '3e269665'
+	);
 
 """
 create table `conversations` (
@@ -31,41 +38,10 @@ create table `conversations` (
 	`ended` timestamp default now() on update now() ,
 	PRIMARY KEY (id)
 )
+create table `users` (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+)
 """
-
-#with connection.cursor() as cursor:
-	#cursor.execute( 'drop table if exists `conversations`;' );
-
-	#cursor.execute( """
-	#	create table `conversations` (
-	#		`id` INTEGER(10) UNSIGNED AUTO_INCREMENT,
-	#		`conversation` varchar(100),
-	#		`user` varchar(100),
-	#		`started` datetime,
-	#		`ended` datetime,
-	#		PRIMARY KEY (id)
-	#	)
-	#""" );
-
-	#cursor.execute( 'delete from `conversations`;' );
-
-	#now = strftime( "%Y-%m-%d %H:%M:%S", gmtime() );
-
-	#sql = "insert into `conversations` (`conversation`,`user`,`started`,`ended`) values(%s, %s, %s, %s);";
-	#cursor.execute( sql, ('1234','5678',now,now) );
-	#connection.commit();
-
-	#cursor.execute( "select * from `conversations`;" );
-	#result = cursor.fetchone();
-	#print( result );
-
-session_opts = {
-	'session.type': 'file',
-	'session.cookie_expires': 300,
-	'session.data_dir': './API/sessions',
-	'session.auto': True
-};
-app = SessionMiddleware( app(), session_opts );
 
 class ManageSessions:
 	def get( self, name ):
@@ -78,43 +54,61 @@ class ManageSessions:
 		s[name] = value;
 		s.save();
 
-response.delete_cookie( 'beaker.session.id' );
+class ManageUsers:
+	@property
+	def data( self ):
+		return session.get( 'user' )['data'];
 
-session = ManageSessions();
-
-def user( value = None ):
-	if value != None:
-		if not isinstance( value, dict ):
-			raise ValueError( '"user" accepts argument of type "dict"' );
-		else:
-			session.set( 'user', value );
-	else:
-		u = session.get( 'user' );
-
-		return u;
+	@property
+	def info( self ):
+		return session.get( 'user' )['info'];
 
 def processResponse( r ):
+	if( r['type'] == 'image' ):
+		thumb_path = 'static/work_images/' + str( user.info['userID'] ) + '.thumb.jpg';
+
+		im = Image.open( r['path'] );
+		im.thumbnail( (128,128) );
+		im.save( thumb_path, "JPEG" );
+
+		r['thumb'] = thumb_path;
+
+	now = strftime( "%Y-%m-%d %H:%M:%S", gmtime() );
+	conversationID = user.info['conversationID'];
+
+	connect();
+
+	with connection.cursor() as cursor:
+		sql = 'update `conversations` set `ended` = "%s" where `id` = "%s"';
+		cursor.execute( sql, (now,conversationID) );
+		connection.commit();
+
 	return r;
 
 def start_conversation():
-	session.set( 'user', {} );
+	userID = request.get_cookie( 'user' );
 
-	conversation = request.get_cookie( 'beaker.session.id' );
-
-	print( conversation );
+	connect();
 
 	with connection.cursor() as cursor:
 		now = strftime( "%Y-%m-%d %H:%M:%S", gmtime() );
 
-		cursor.execute( "delete from `conversations`;" );
+		if( userID is None ):
+			cursor.execute( "insert into `users` (`id`) values (NULL)" );
+			cursor.execute( "select * from `users` order by `id` desc;" );
+			row = cursor.fetchone();
 
-		sql = "insert into `conversations` (`conversation`,`user`,`started`,`ended`) values(%s, %s, %s, %s);";
-		cursor.execute( sql, (conversation,'5678',now,now) );
+			response.set_cookie( 'user', str(row['id']), expires = datetime.today() + timedelta( weeks=52 ) );
+			userID = row['id'];
+
+		sql = "insert into `conversations` (`user`,`started`,`ended`) values(%s, %s, %s);";
+		cursor.execute( sql, (userID,now,now) );
 		connection.commit();
 
-		cursor.execute( "select * from `conversations`;" );
-		result = cursor.fetchone();
-		print( result );
+		cursor.execute( "select `id` from `conversations` order by `id` desc;" );
+		row = cursor.fetchone();
+
+		session.set( 'user', { 'info': { 'userID': userID, 'conversationID': row['id'] }, 'data': {} } );
 
 def start( host = 'localhost', port = 4242 ):
 	host = os.getenv( 'VCAP_APP_HOST', host );
@@ -131,3 +125,14 @@ def start( host = 'localhost', port = 4242 ):
 		return static_file(filepath, root='./static');
 
 	run( host = host, port = port, app=app );
+
+session_opts = {
+	'session.type': 'file',
+	'session.data_dir': './API/sessions',
+	'session.auto': True
+};
+app = SessionMiddleware( app(), session_opts );
+
+response.delete_cookie( 'beaker.session.id' );
+session = ManageSessions();
+user = ManageUsers();

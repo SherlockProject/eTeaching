@@ -1,4 +1,6 @@
 
+	var ltIE8 = false; /*@cc_on ltIE8 = (@_jscript_version < 9); @*/
+
 	String.prototype.is_string = true;
 	Array.prototype.is_array = true;
 
@@ -162,6 +164,8 @@
 			.onComplete( function () {
 				tools.style.visibility = 'visible';
 				form.style.visibility = 'visible';
+
+				chat().init();
 			} )
 			.chain( interfaceAnim );
 

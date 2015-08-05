@@ -30,7 +30,9 @@
 					<!--
 					<div class="post robot">
 						<div class="avatar"><div class="face"><span class="eyes"></span></div></div>
-						<div class="message">Make a selection around the person and <a href="#">click OK.</a></div>
+						<div class="bigcont">
+							<div class="message">Make a selection around the person and <a href="#">click OK.</a></div>
+						</div>
 					</div>
 					<div class="post robot eyes-up">
 						<div class="avatar" title="Thinking...">
@@ -39,10 +41,14 @@
 								<span class="eyes"></span>
 							</div>
 						</div>
-						<div class="thumb"><img src="images/thumb1.jpg" alt="" /></div>
+						<div class="bigcont">
+							<div class="thumb"><img src="images/thumb1.jpg" alt="" /></div>
+						</div>
 					</div>
 					<div class="post human">
-						<div class="message">Now that we know who you are I know who I am</div>
+						<div class="bigcont">
+							<div class="message">Now that we know who you are I know who I am</div>
+						</div>
 					</div>
 					-->
 				</div>
@@ -56,6 +62,7 @@
 				</div>
 			</div>
 			<div id="image-col">
+				<div id="image-parent"></div>
 				<div id="tools-parent">
 					<ul id="tools">
 						<li><a title="Upload Image" id="upload"><img src="images/upload-icon.jpg" alt="" />Add Image</a></li>
@@ -84,7 +91,6 @@
 		<div id="l4" class="load-line"></div>
 		<div id="l5" class="load-line"></div>
 		<script>
-			chat();		// Run Chat
 			toolset();	// Run Toolset
 		</script>
 	</body>

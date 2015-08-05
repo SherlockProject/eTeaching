@@ -43,6 +43,5 @@ response = {
 response = {
 	'type': 'image',
 	'text': '...', // optional
-	'path': '...',
-	'text': '...'
+	'path': '...'
 }
