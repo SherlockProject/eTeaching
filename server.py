@@ -1,6 +1,6 @@
+from API import WebServer # also install requirements.txt
 from sherlock.watson.watson import WatsonService
 from API.WebServer import user
-from API import WebServer
 import json as JSON
 import bottle
 
