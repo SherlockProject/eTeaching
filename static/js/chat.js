@@ -127,7 +127,7 @@
 						scrollToBottom();
 
 						if( sound ) {
-							var path = 'sound/answer.ogg';
+							var path = 'sound/answer.ogg?rand=' + Math.random();
 
 							if( message == 'Hello, my name is Sherlock! If you want to see a photo - type "image". If you\'d like to hear some latin - just type anything.' )
 								path = 'sound/hello.ogg';
