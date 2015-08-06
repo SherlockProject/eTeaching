@@ -6,8 +6,13 @@ import pprint;
 def printTitle( str ):
 	print( ( '{0}| ' + str + '{0}' ).format( '\n|------------------------------------------------\n' ) );
 
+online = os.getenv( 'online', 'no' );
+
 printTitle( 'Installing packages from requirements.txt ...' );
-subprocess.call( "pip install -r requirements.txt", stdout=subprocess.PIPE );
+
+if( online == 'no' ):
+	subprocess.call( "pip install -r requirements.txt", stdout=subprocess.PIPE );
+
 print( 'Done.\n' );
 printTitle( 'Web Server starting...' );
 

@@ -15,7 +15,10 @@ textToSpeech = WatsonService(
 	}
 );
 
-hello = 'Hello, my name is Sherlock! If you want to see a photo - type "image". If you\'d like to hear some latin - just type anything.';
+hello = """
+	Hello, my name is Sherlock! If you want to see a photo - type "image".
+	If you'd like to hear some latin - just type anything.
+""";
 
 # Returning text (http://localhost:4242/process)
 @bottle.post( '/process' )
@@ -34,22 +37,19 @@ def process_func():
 		# import pprint;
 		# pprint.pprint( user.info ); # user and conversation identifiers
 		# pprint.pprint( user.data ); # empty dict that can be used throughout the whole conversation as storage
-		                              # e.g. you can store all images that you have used in a conversation
+		                              # e.g. you can store all images that you have already used in a conversation
 
+		# Example usage of user.data: counting answers
 		if( 'iteration' not in user.data ):
 			user.data['iteration'] = 0;
 
 		user.data['iteration'] = user.data['iteration'] + 1;
 		print( '\nIteration: ' + str( user.data['iteration'] ) );
 
-		#-------------------------- Generate Random Text ---------------------------------------------------------#
-		import requests,shutil;
-		randomText = requests.get( 'http://loripsum.net/api/plaintext/1/short/headers' ).text.split( '\n' )[0];
-		#---------------------------------------------------------------------------------------------------------#
-
+		# If user typed "image" in the text box
 		if( request['text'] == 'image' ):
 
-			#---------------------------- download random image ----------------------------#
+			#-------------------------- Download Random Image --------------------------------------------------------#
 			r = requests.get( 'http://lorempixel.com/600/400/', stream=True );
 			image_path = 'static/work_images/' + str( user.info['userID'] ) + '.jpg';
 
@@ -57,15 +57,22 @@ def process_func():
 				with open( image_path, 'wb' ) as f:
 					r.raw.decode_content = True;
 					shutil.copyfileobj( r.raw, f );
-			#-------------------------------------------------------------------------------#
+			#---------------------------------------------------------------------------------------------------------#
 
 			response = {
 				'type': 'image',
-				'text': 'Take a look at this image. Can you help me find Waldo?',
+				'text': 'Take a look at this photo. Can you help me find Waldo?',
 				'path': image_path,
 				'imid': 'image-identifier' # unique identifier (image name/id in a database)
 			};
+
 		else:
+
+			#-------------------------- Generate Random Text ---------------------------------------------------------#
+			import requests,shutil;
+			randomText = requests.get( 'http://loripsum.net/api/plaintext/1/short/headers' ).text.split( '\n' )[0];
+			#---------------------------------------------------------------------------------------------------------#
+
 			response = {
 				'type': 'message',
 				'text': randomText
@@ -92,3 +99,5 @@ def process_func():
 	return WebServer.processResponse( response );
 
 WebServer.start();
+
+# cf push eTeaching -p eTeaching -m 512M -n eteaching
