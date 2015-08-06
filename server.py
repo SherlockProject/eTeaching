@@ -15,10 +15,7 @@ textToSpeech = WatsonService(
 	}
 );
 
-hello = """
-	Hello, my name is Sherlock! If you want to see a photo - type "image".
-	If you'd like to hear some latin - just type anything.
-""";
+hello = 'Hello, my name is Sherlock! If you want to see a photo - type "image". If you\'d like to hear some latin - just type anything.';
 
 # Returning text (http://localhost:4242/process)
 @bottle.post( '/process' )
