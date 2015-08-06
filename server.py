@@ -83,9 +83,9 @@ def process_func():
 	# generate sound file
 	if( request['sound'] == 'on' and response['text'] and response['text'] != hello ):
 		result = textToSpeech.synthesize( params = {
-			'accept': 'audio/ogg; codecs=opus',
 			'voice': 'en-US_MichaelVoice',
-			'text': response['text']
+			'text': response['text'],
+			'accept': 'audio/wav'
 		} );
 
 		# Save File
