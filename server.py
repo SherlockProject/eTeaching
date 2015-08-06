@@ -89,7 +89,7 @@ def process_func():
 		} );
 
 		# Save File
-		ogg = open( 'static/sound/answer.ogg', 'wb' );
+		ogg = open( 'static/sound/answer.wav', 'wb' );
 		ogg.write( result );
 
 	return WebServer.processResponse( response );
