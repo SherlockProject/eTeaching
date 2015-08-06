@@ -1,8 +1,8 @@
 from API import WebServer # also install requirements.txt
 from sherlock.watson.watson import WatsonService
+import bottle, requests, shutil
 from API.WebServer import user
 import json as JSON
-import bottle
 
 textToSpeech = WatsonService(
 	url = 'https://stream.watsonplatform.net/text-to-speech/api',
@@ -69,7 +69,6 @@ def process_func():
 		else:
 
 			#-------------------------- Generate Random Text ---------------------------------------------------------#
-			import requests,shutil;
 			randomText = requests.get( 'http://loripsum.net/api/plaintext/1/short/headers' ).text.split( '\n' )[0];
 			#---------------------------------------------------------------------------------------------------------#
 
