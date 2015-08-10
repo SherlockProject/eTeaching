@@ -4,12 +4,29 @@ class LangAnalyser:
 
     def __init__(self):
         self.alchemyapi = AlchemyAPI()
+        self.rel_opt = {'sentiment': 0, 'keywords': 0, 'entities': 1}
+        self.key_opt = {'sentiment': 0}
 
     def analyse(self, text):
+        # get Alchemy Results
+        alchRelations = self.alchemyapi.relations('text', text, self.rel_opt)
+        alchKeywords = self.alchemyapi.keywords('text', text, self.key_opt)
+        rel = alchRelations['relations']
+        key = alchKeywords['keywords'].values().sort(key = lambda x: x[0], reverse = True)
 
+        # remove Relations without Keywords!
+        for x, keyword in key:
+            # check if kewword object or subject in relations, if not
+            #                           remove from relations
+            # PROBELM: the jsons become very ugly to handle, depth and keys
+            #          are not well defined! 
+            pass
 
-        # currently, no analysis
-        return text
+        res = {}
+        res['relations'] = rel
+        res['keywords'] = key
+
+        return res
 
     def testAlchemyLanguage(self, text):
 
