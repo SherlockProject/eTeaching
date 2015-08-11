@@ -39,6 +39,7 @@ class LangAnalyser(object):
             #                           remove from relations
             # PROBELM: the jsons become very ugly to handle, depth and keys
             #          are not well defined!
+            # TODO: Complete __cleanupRelations
             pass
 
         res = {}
@@ -66,7 +67,7 @@ class LangAnalyser(object):
         Args:
         text -- short text that will get analysed by all AlchemyAPI algorithms.
 
-        Keyword results:
+        Returns:
         result -- dicionary containing AlchmeyAPI result dictionaries in
                   labled keys.
         """
