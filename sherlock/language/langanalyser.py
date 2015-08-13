@@ -30,8 +30,9 @@ class LangAnalyser(object):
         # get Alchemy Results
         alchRelations = self._alchemyapi.relations('text', text, self._rel_opt)
         alchKeywords = self._alchemyapi.keywords('text', text, self._key_opt)
-        rel = alchRelations['relations']
-        key = alchKeywords['keywords'].values().sort(key = lambda x: x[0], reverse = True)
+        rela = alchRelations['relations']
+        keyW = [( d['relevance'], d['text'] ) for d in alchKeywords['keywords']]
+        kewW.sort(reverse = True)
 
         # remove Relations without Keywords!
         for x, keyword in key:
@@ -58,7 +59,13 @@ class LangAnalyser(object):
         resDict -- cleaned up and determined structure containing the same
                    information contained in relDict; strucutre:
                    .... TODO: define!
+                   [#number]: [subj]: ('text', 'type')
+                              [verb]: ('text', 'type')
+                              [objc]: ('text', 'type')
         """
+
+        #
+
 
 
     def testAlchemyLanguage(self, text):

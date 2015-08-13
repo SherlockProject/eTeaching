@@ -8,6 +8,7 @@ class Sherlock:
 
     # Initialise clean Instance.
     def __init__(self, string):
+        #internal organisation
         self.noSessions = 0
         self.activeSession = False
         self.currImage = ''
@@ -16,6 +17,8 @@ class Sherlock:
         self.Vision = VisAnalyser()
         self.Language = LangAnalyser()
         self.Dialoge = DialogueHandler()
+
+        # Alchemy Transactions
 
     # public access to processing in the sherlock project!
     # will return a dict with return type, message and possibly

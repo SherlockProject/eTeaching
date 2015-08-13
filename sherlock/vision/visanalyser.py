@@ -12,7 +12,8 @@ class VisAnalyser:
 
     def process(self, imgPATH):
          temp = self.__getAlchemyTags(imgPATH)
-         res = temp['imageKeywords'].values().sort(key = lambda tup: tup[0], reverse = True)
+         res = [( d['score'], d['text'] ) for d in temp['imageKeywords']]
+         res.sort(reverse = True)
 
          return res
 
