@@ -29,19 +29,16 @@ class LangAnalyser(object):
         """
         # get Alchemy Results
         alchRelations = self._alchemyapi.relations('text', text, self._rel_opt)
-        alchKeywords = self._alchemyapi.keywords('text', text, self._key_opt)
-        rela = alchRelations['relations']
+        alchKeywords = self._alchemyapi.keywords('texit', text, self._key_opt)
+        relL = alchRelations['relations']
         keyW = [( d['relevance'], d['text'] ) for d in alchKeywords['keywords']]
         kewW.sort(reverse = True)
+        relations = self.__cleanupRelations(relL)
 
-        # remove Relations without Keywords!
-        for x, keyword in key:
-            # check if kewword object or subject in relations, if not
-            #                           remove from relations
-            # PROBELM: the jsons become very ugly to handle, depth and keys
-            #          are not well defined!
-            # TODO: Complete __cleanupRelations
-            pass
+
+        relations[:] = [itm for itm in relations
+                        if True in [x[1].lower() in (itm['obj'].lower() or
+                                    itm['sbj'].lower()) for x in kewW]]
 
         res = {}
         res['relations'] = rel
@@ -49,7 +46,7 @@ class LangAnalyser(object):
 
         return res
 
-    def __cleanupRelaions(self, relDict):
+    def cleanupRelations(self, relList):
         """clean up a dictionary of relations returned by AlchemyAPI.
 
         Args:
@@ -58,13 +55,24 @@ class LangAnalyser(object):
         Returns:
         resDict -- cleaned up and determined structure containing the same
                    information contained in relDict; strucutre:
-                   .... TODO: define!
-                   [#number]: [subj]: ('text', 'type')
-                              [verb]: ('text', 'type')
-                              [objc]: ('text', 'type')
+                   LIST:
+                              [sbj]: ('text', 'type')
+                              [veb]: ('text', 'type')
+                              [obj]: ('text', 'type')
         """
 
-        #
+        clean_rels = []
+        idx = 0
+        for rel in relList:
+            clean_rels.append({})
+            clean_rels[idx]['sbj'] = list(rel['subject']['keywords'][0].values())[0]
+            clean_rels[idx]['vrb'] = rel['action']['lemmatized']
+            clean_rels[idx]['obj'] = rel['object']['text']
+            clean_rels[idx]['tns'] = rel['action']['verb']['tense']
+            idx += 1
+
+        return clean_rels
+
 
 
 
