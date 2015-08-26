@@ -29,24 +29,24 @@ class LangAnalyser(object):
         """
         # get Alchemy Results
         alchRelations = self._alchemyapi.relations('text', text, self._rel_opt)
-        alchKeywords = self._alchemyapi.keywords('texit', text, self._key_opt)
+        alchKeywords = self._alchemyapi.keywords('text', text, self._key_opt)
         relL = alchRelations['relations']
         keyW = [( d['relevance'], d['text'] ) for d in alchKeywords['keywords']]
-        kewW.sort(reverse = True)
+        keyW.sort(reverse = True)
         relations = self.__cleanupRelations(relL)
 
 
         relations[:] = [itm for itm in relations
                         if True in [x[1].lower() in (itm['obj'].lower() or
-                                    itm['sbj'].lower()) for x in kewW]]
+                                    itm['sbj'].lower()) for x in keyW]]
 
         res = {}
-        res['relations'] = rel
-        res['keywords'] = key
+        res['relations'] = relations
+        res['keywords'] = keyW
 
         return res
 
-    def cleanupRelations(self, relList):
+    def __cleanupRelations(self, relList):
         """clean up a dictionary of relations returned by AlchemyAPI.
 
         Args:
@@ -56,18 +56,26 @@ class LangAnalyser(object):
         resDict -- cleaned up and determined structure containing the same
                    information contained in relDict; strucutre:
                    LIST:
-                              [sbj]: ('text', 'type')
-                              [veb]: ('text', 'type')
-                              [obj]: ('text', 'type')
+                              'sbj'
+                              'veb'
+                              'obj'
+                              'tns'
         """
+
+        #TODO: objects come in different forms, with different keys. fuck that.
 
         clean_rels = []
         idx = 0
         for rel in relList:
+            # small intermediate step for different object keys:
+            object_L = [x for x in rel.keys() if not (x == 'subject' or
+                                                      x == 'action' or
+                                                      x == 'sentence')]
+            object = object_L[0]
             clean_rels.append({})
-            clean_rels[idx]['sbj'] = list(rel['subject']['keywords'][0].values())[0]
+            clean_rels[idx]['sbj'] = rel['subject']['text']
             clean_rels[idx]['vrb'] = rel['action']['lemmatized']
-            clean_rels[idx]['obj'] = rel['object']['text']
+            clean_rels[idx]['obj'] = rel[object]['text']
             clean_rels[idx]['tns'] = rel['action']['verb']['tense']
             idx += 1
 
